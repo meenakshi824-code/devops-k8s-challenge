@@ -4,9 +4,12 @@ A small DevOps project demonstrating containerization and deployment of a Flask 
 
 ## Project Overview
 
-The goal of this project was to containerize a simple Flask API and deploy it on a local Kubernetes cluster.
+The goal of this project was to containerize a Flask API and deploy it on a local Kubernetes cluster.
 
-The application exposes a `/health` endpoint that returns the health status of the API.
+The application exposes a `/health` endpoint that returns:
+
+```json
+{"status":"healthy"}
 
 ## Architecture
 
