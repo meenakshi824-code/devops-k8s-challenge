@@ -23,10 +23,8 @@ jobs:
           pip install -r app/requirement.txt
 
       - name: Run tests
-        env:
-          PYTHONPATH: .
         run: |
-          pytest app/tests
+          PYTHONPATH=${{ github.workspace }} pytest app/tests
 
       - name: Build Docker image
         run: |
