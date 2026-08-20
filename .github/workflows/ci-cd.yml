@@ -1,0 +1,65 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          pip install -r app/requirement.txt
+
+      - name: Run tests
+        run: |
+          pytest app/tests
+
+      - name: Build Docker image
+        run: |
+          docker build -t devops-challenge-api:v1 .
+
+      - name: Create Kind cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: devops-challenge
+
+      - name: Load Docker image into Kind
+        run: |
+          kind load docker-image devops-challenge-api:v1 --name devops-challenge
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/api-deployment.yaml
+
+      - name: Wait for deployment
+        run: |
+          kubectl rollout status deployment/devops-challenge-api --timeout=120s
+
+      - name: Verify Kubernetes resources
+        run: |
+          kubectl get pods
+          kubectl get svc
+
+      - name: Test application
+        run: |
+          kubectl run curl-test \
+            --image=curlimages/curl \
+            --restart=Never \
+            --command -- \
+            curl -f http://devops-challenge-api.default.svc.cluster.local/health
+
+          kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/curl-test --timeout=60s
+          kubectl get pod curl-test
+          kubectl delete pod curl-test
