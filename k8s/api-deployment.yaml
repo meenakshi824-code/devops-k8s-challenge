@@ -27,6 +27,8 @@ spec:
               port: 5000
             initialDelaySeconds: 5
             periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
 
           livenessProbe:
             httpGet:
@@ -34,6 +36,8 @@ spec:
               port: 5000
             initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
 
           resources:
             requests:
