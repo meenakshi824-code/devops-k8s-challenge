@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-challenge-api
+  labels:
+    app: devops-challenge-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: devops-challenge-api
+  template:
+    metadata:
+      labels:
+        app: devops-challenge-api
+    spec:
+      containers:
+        - name: api
+          image: devops-challenge-api:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devops-challenge-api
+spec:
+  selector:
+    app: devops-challenge-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: ClusterIP
