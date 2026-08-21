@@ -18,6 +18,19 @@ spec:
         - name: api
           image: devops-challenge-api:v1
           imagePullPolicy: IfNotPresent
+
+          env:
+            - name: DB_HOST
+              value: postgres
+            - name: DB_NAME
+              value: devops
+            - name: DB_USER
+              value: devops
+            - name: DB_PASSWORD
+              value: devops123
+            - name: DB_PORT
+              value: "5432"
+
           ports:
             - containerPort: 5000
 
